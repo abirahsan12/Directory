@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>কলিগ ডিরেক্টরি</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<style>
+:root{--ink:#1B2A2F;--bg:#EDF1F2;--card:#fff;--brand:#0F4C5C;--accent:#E36414;--line:#D5DDE0;--mute:#5B6B70;--wa:#1E9E55;color-scheme:light}
+@media(prefers-color-scheme:dark){:root{--ink:#E8EEF0;--bg:#10181B;--card:#1A272B;--brand:#4FB3C8;--accent:#FF8A4C;--line:#2B3B40;--mute:#93A5AA;color-scheme:dark}}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font-family:"Hind Siliguri",system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.5;padding:env(safe-area-inset-top,0) 0 env(safe-area-inset-bottom,0)}
+.wrap{max-width:640px;margin:0 auto;padding:16px}
+h1{font-size:1.5rem;margin:0;font-weight:700;color:var(--brand)}
+.sub{color:var(--mute);margin:2px 0 16px}
+input,select,button,textarea{font:inherit;color:inherit}
+input,select{width:100%;padding:11px 12px;border:1.5px solid var(--line);border-radius:10px;background:var(--card)}
+input:focus,select:focus,button:focus-visible{outline:3px solid color-mix(in srgb,var(--brand) 45%,transparent);outline-offset:1px}
+.btn{border:0;border-radius:10px;padding:11px 16px;font-weight:600;cursor:pointer;background:var(--brand);color:#fff}
+@media(prefers-color-scheme:dark){.btn{color:#0A1A1F}}
+.btn.alt{background:transparent;color:var(--brand);border:1.5px solid var(--line)}
+.btn.danger{background:transparent;color:#C0392B;border:1.5px solid var(--line)}
+.login{margin-top:12vh;background:var(--card);border-radius:16px;padding:22px;border:1px solid var(--line)}
+.login label{display:block;font-weight:600;margin-bottom:6px}
+.login .btn{width:100%;margin-top:12px}
+.err{color:#C0392B;min-height:1.4em;margin:8px 0 0}
+.bar{display:flex;gap:8px;margin-bottom:8px}
+.filters{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.meta{display:flex;justify-content:space-between;align-items:center;color:var(--mute);margin:6px 2px 10px}
+.card{background:var(--card);border:1px solid var(--line);border-left:5px solid var(--brand);border-radius:12px;padding:14px;margin-bottom:10px}
+.card h3{margin:0;font-size:1.1rem}
+.card .role{color:var(--accent);font-weight:600}
+.card .unit{color:var(--mute)}
+.phone{font-weight:600;margin:8px 0;letter-spacing:.02em}
+.acts{display:flex;gap:8px;flex-wrap:wrap}
+.acts a,.acts button{flex:1;min-width:90px;text-align:center;text-decoration:none;padding:9px 10px;border-radius:9px;font-weight:600;cursor:pointer;border:0}
+.call{background:var(--brand);color:#fff}
+.wa{background:var(--wa);color:#fff}
+.small{background:transparent;border:1.5px solid var(--line)!important;color:var(--ink)}
+.empty{text-align:center;color:var(--mute);padding:36px 12px}
+.note{background:#FFF4D6;color:#5A4300;border-radius:10px;padding:8px 12px;margin-bottom:12px;font-size:.9rem}
+dialog{border:0;border-radius:16px;padding:20px;width:min(92vw,420px);background:var(--card);color:var(--ink)}
+dialog::backdrop{background:rgba(0,0,0,.5)}
+dialog h2{margin:0 0 12px;font-size:1.2rem}
+dialog label{display:block;font-weight:600;margin:10px 0 4px}
+.row{display:flex;gap:8px;margin-top:16px}
+.row .btn{flex:1}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1 id="title"></h1>
+  <p class="sub" id="subtitle"></p>
+  <div id="demoNote" class="note" hidden>ডেমো মোড: ডাটাবেস সংযুক্ত নেই। সদস্য কোড ১২৩৪, অ্যাডমিন কোড ০০০০ (ইংরেজি সংখ্যায় লিখুন)।</div>
+
+  <section id="login" class="login">
+    <label for="code">অ্যাক্সেস কোড</label>
+    <input id="code" type="password" autocomplete="off" placeholder="কোড লিখুন">
+    <p class="err" id="loginErr" role="alert"></p>
+    <button class="btn" id="loginBtn">প্রবেশ করুন</button>
+  </section>
+
+  <section id="app" hidden>
+    <div class="bar">
+      <input id="q" type="search" placeholder="নাম বা মোবাইল নম্বর দিয়ে খুঁজুন">
+    </div>
+    <div class="filters">
+      <select id="fDes" aria-label="পদবি"><option value="">সব পদবি</option></select>
+      <select id="fUnit" aria-label="বিভাগ"><option value="">সব বিভাগ</option></select>
+    </div>
+    <div class="meta">
+      <span id="count"></span>
+      <span>
+        <button class="btn" id="addBtn" hidden>নতুন সদস্য</button>
+        <button class="btn alt" id="logoutBtn">বের হন</button>
+      </span>
+    </div>
+    <div id="list"></div>
+  </section>
+</div>
+
+<dialog id="dlg">
+  <form method="dialog" id="form">
+    <h2 id="dlgTitle">সদস্যের তথ্য</h2>
+    <label for="mName">নাম</label><input id="mName" required>
+    <label for="mDes">পদবি</label><input id="mDes">
+    <label for="mUnit">বিভাগ বা অফিস</label><input id="mUnit">
+    <label for="mPhone">মোবাইল নম্বর</label><input id="mPhone" type="tel" inputmode="tel" required placeholder="01XXXXXXXXX">
+    <div class="row">
+      <button class="btn alt" type="button" id="cancel">বাতিল</button>
+      <button class="btn" type="submit">সংরক্ষণ করুন</button>
+    </div>
+  </form>
+</dialog>
+
+<script>
+/* ===== সেটিংস: এখানে নিজের Supabase তথ্য বসান ===== */
+const CONFIG = {
+  SUPABASE_URL: "https://syxtyqlucnusmyeilfcy.supabase.co",
+  SUPABASE_ANON_KEY: "sb_publishable_t0SzOMtNT-XPYeDdr9r_qA_JIqeCqTE",
+  APP_TITLE: "কলিগ ডিরেক্টরি",
+  SUBTITLE: "সহকর্মীদের যোগাযোগ নম্বর"
+};
+/* ================================================== */
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const sb = (CONFIG.SUPABASE_URL && window.supabase) ? supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY) : null;
+
+/* ডেমো ডাটা (শুধু ডাটাবেস ছাড়া প্রিভিউর জন্য) */
+const demoSeed = () => [
+  {id:"1",name:"রহিম উদ্দিন",designation:"ব্যবস্থাপক",unit:"প্রশাসন",phone:"01700000001"},
+  {id:"2",name:"করিম হোসেন",designation:"হিসাবরক্ষক",unit:"হিসাব বিভাগ",phone:"01800000002"},
+  {id:"3",name:"সুমি আক্তার",designation:"অফিস সহকারী",unit:"প্রশাসন",phone:"01900000003"}
+];
+let demoRows = demoSeed();
+const bad = () => { throw new Error("কোড ভুল"); };
+
+const api = sb ? {
+  async login(code){ const {data,error}=await sb.rpc("login",{code}); if(error) throw error; return data; },
+  async list(code){ const {data,error}=await sb.rpc("list_members",{code}); if(error) throw error; return data; },
+  async save(code,m){ const {error}=await sb.rpc("save_member",{admin_code:code,m_id:m.id||null,m_name:m.name,m_des:m.designation,m_unit:m.unit,m_phone:m.phone}); if(error) throw error; },
+  async del(code,id){ const {error}=await sb.rpc("delete_member",{admin_code:code,m_id:id}); if(error) throw error; }
+} : {
+  async login(code){ return code==="0000"?"admin":code==="1234"?"member":"none"; },
+  async list(){ return [...demoRows]; },
+  async save(code,m){ if(code!=="0000") bad(); if(m.id) demoRows=demoRows.map(r=>r.id===m.id?{...r,...m}:r); else demoRows.push({...m,id:String(Date.now())}); },
+  async del(code,id){ if(code!=="0000") bad(); demoRows=demoRows.filter(r=>r.id!==id); }
+};
+
+let code="", role="none", rows=[];
+
+$("title").textContent = CONFIG.APP_TITLE;
+$("subtitle").textContent = CONFIG.SUBTITLE;
+document.title = CONFIG.APP_TITLE;
+$("demoNote").hidden = !!sb;
+
+const bn = n => String(n).replace(/\d/g, d => "০১২৩৪৫৬৭৮৯"[d]);
+const digits = p => String(p).replace(/\D/g,"");
+const waNum = p => { const d=digits(p); return d.startsWith("880")?d:d.startsWith("0")?"88"+d:"880"+d; };
+
+async function enter(c, silent){
+  $("loginErr").textContent = "";
+  try{
+    const r = await api.login(c);
+    if(r!=="member" && r!=="admin"){ if(!silent) $("loginErr").textContent="কোডটি সঠিক নয়। আবার চেষ্টা করুন।"; return; }
+    code=c; role=r; rows=await api.list(c);
+    try{ localStorage.setItem("dir_code",c); }catch{}
+    $("login").hidden=true; $("app").hidden=false; $("addBtn").hidden = role!=="admin";
+    fillFilters(); render();
+  }catch(e){ if(!silent) $("loginErr").textContent="সংযোগে সমস্যা হয়েছে। ইন্টারনেট ও সেটিং দেখুন।"; }
+}
+
+function fillFilters(){
+  const opts=(key,el,label)=>{ const cur=el.value; const vals=[...new Set(rows.map(r=>r[key]).filter(Boolean))].sort();
+    el.innerHTML=`<option value="">${label}</option>`+vals.map(v=>`<option>${esc(v)}</option>`).join(""); el.value=vals.includes(cur)?cur:""; };
+  opts("designation",$("fDes"),"সব পদবি"); opts("unit",$("fUnit"),"সব বিভাগ");
+}
+
+function render(){
+  const q=$("q").value.trim().toLowerCase(), d=$("fDes").value, u=$("fUnit").value;
+  const res=rows.filter(r=>(!d||r.designation===d)&&(!u||r.unit===u)&&(!q||(r.name||"").toLowerCase().includes(q)||digits(r.phone).includes(digits(q)||"x")||(r.phone||"").includes(q)));
+  $("count").textContent = `মোট ${bn(res.length)} জন`;
+  $("list").innerHTML = res.length ? res.map(r=>`
+    <article class="card">
+      <h3>${esc(r.name)}</h3>
+      <div><span class="role">${esc(r.designation)}</span>${r.unit?` <span class="unit">· ${esc(r.unit)}</span>`:""}</div>
+      <div class="phone">${esc(r.phone)}</div>
+      <div class="acts">
+        <a class="call" href="tel:${esc(digits(r.phone))}">কল করুন</a>
+        <a class="wa" href="https://wa.me/${waNum(r.phone)}" target="_blank" rel="noopener">WhatsApp</a>
+        ${role==="admin"?`<button class="small" data-edit="${esc(r.id)}">সম্পাদনা</button><button class="small" data-del="${esc(r.id)}">মুছুন</button>`:""}
+      </div>
+    </article>`).join("") : `<div class="empty">কাউকে পাওয়া যায়নি। খোঁজার শব্দ বা ফিল্টার বদলে দেখুন।</div>`;
+}
+
+let editId=null;
+function openForm(r){
+  editId=r?r.id:null; $("dlgTitle").textContent=r?"তথ্য সম্পাদনা":"নতুন সদস্য যোগ";
+  $("mName").value=r?.name||""; $("mDes").value=r?.designation||""; $("mUnit").value=r?.unit||""; $("mPhone").value=r?.phone||"";
+  $("dlg").showModal();
+}
+async function reload(){ rows=await api.list(code); fillFilters(); render(); }
+
+$("loginBtn").onclick=()=>enter($("code").value.trim());
+$("code").addEventListener("keydown",e=>{ if(e.key==="Enter") enter($("code").value.trim()); });
+$("logoutBtn").onclick=()=>{ try{localStorage.removeItem("dir_code");}catch{} code="";role="none";rows=[]; $("code").value=""; $("app").hidden=true; $("login").hidden=false; };
+$("q").oninput=render; $("fDes").onchange=render; $("fUnit").onchange=render;
+$("addBtn").onclick=()=>openForm(null);
+$("cancel").onclick=()=>$("dlg").close();
+$("form").addEventListener("submit",async e=>{
+  e.preventDefault();
+  try{
+    await api.save(code,{id:editId,name:$("mName").value.trim(),designation:$("mDes").value.trim(),unit:$("mUnit").value.trim(),phone:$("mPhone").value.trim()});
+    $("dlg").close(); await reload();
+  }catch{ alert("সংরক্ষণ করা যায়নি। অ্যাডমিন কোড ও ইন্টারনেট দেখুন।"); }
+});
+$("list").addEventListener("click",async e=>{
+  const ed=e.target.closest("[data-edit]"), dl=e.target.closest("[data-del]");
+  if(ed) openForm(rows.find(r=>r.id===ed.dataset.edit));
+  if(dl && confirm("এই সদস্যকে মুছে ফেলবেন?")){ try{ await api.del(code,dl.dataset.del); await reload(); }catch{ alert("মোছা যায়নি।"); } }
+});
+
+try{ const saved=localStorage.getItem("dir_code"); if(saved) enter(saved,true); }catch{}
+</script>
+</body>
+</html>
