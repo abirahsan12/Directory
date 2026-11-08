@@ -9,14 +9,17 @@
 <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 <style>
-:root{--ink:#1B2A2F;--bg:#EDF1F2;--card:#fff;--brand:#0F4C5C;--accent:#E36414;--line:#D5DDE0;--mute:#5B6B70;--wa:#1E9E55;color-scheme:light}
-@media(prefers-color-scheme:dark){:root{--ink:#E8EEF0;--bg:#10181B;--card:#1A272B;--brand:#4FB3C8;--accent:#FF8A4C;--line:#2B3B40;--mute:#93A5AA;color-scheme:dark}}
+:root{--ink:#1B2A2F;--bg:#EDF1F2;--card:#fff;--brand:#0F4C5C;--accent:#E36414;--line:#D5DDE0;--mute:#5B6B70;--wa:#1E9E55;--hero:#0F4C5C;--onb:#fff;color-scheme:light}
+@media(prefers-color-scheme:dark){:root{--ink:#E8EEF0;--bg:#10181B;--card:#1A272B;--brand:#4FB3C8;--accent:#FF8A4C;--line:#2B3B40;--mute:#93A5AA;--hero:#0B3540;--onb:#0A1A1F;color-scheme:dark}}
 *{box-sizing:border-box}
 html,body{margin:0}
 body{font-family:"Hind Siliguri",system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.5;padding:env(safe-area-inset-top,0) 0 env(safe-area-inset-bottom,0)}
 .wrap{max-width:640px;margin:0 auto;padding:16px}
-h1{font-size:1.5rem;margin:0;font-weight:700;color:var(--brand)}
-.sub{color:var(--mute);margin:2px 0 16px}
+.hero{background:var(--hero);color:#fff;padding:26px 16px 62px;border-radius:0 0 24px 24px}
+.hero .in{max-width:640px;margin:0 auto}
+h1{font-size:1.6rem;margin:0;font-weight:700;color:#fff}
+.sub{margin:2px 0 0;opacity:.85}
+.wrap{margin-top:-38px}
 input,select,button,textarea{font:inherit;color:inherit}
 input,select{width:100%;padding:11px 12px;border:1.5px solid var(--line);border-radius:10px;background:var(--card)}
 input:focus,select:focus,button:focus-visible{outline:3px solid color-mix(in srgb,var(--brand) 45%,transparent);outline-offset:1px}
@@ -24,23 +27,33 @@ input:focus,select:focus,button:focus-visible{outline:3px solid color-mix(in srg
 @media(prefers-color-scheme:dark){.btn{color:#0A1A1F}}
 .btn.alt{background:transparent;color:var(--brand);border:1.5px solid var(--line)}
 .btn.danger{background:transparent;color:#C0392B;border:1.5px solid var(--line)}
-.login{margin-top:12vh;background:var(--card);border-radius:16px;padding:22px;border:1px solid var(--line)}
+.login{background:var(--card);border-radius:16px;padding:22px;border:1px solid var(--line);box-shadow:0 8px 24px rgba(15,76,92,.14)}
 .login label{display:block;font-weight:600;margin-bottom:6px}
 .login .btn{width:100%;margin-top:12px}
 .err{color:#C0392B;min-height:1.4em;margin:8px 0 0}
-.bar{display:flex;gap:8px;margin-bottom:8px}
+.bar{display:flex;gap:8px;margin-bottom:10px}
+.bar input{box-shadow:0 6px 18px rgba(15,76,92,.16);border-color:transparent;padding:14px}
 .filters{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
 .meta{display:flex;justify-content:space-between;align-items:center;color:var(--mute);margin:6px 2px 10px}
-.card{background:var(--card);border:1px solid var(--line);border-left:5px solid var(--brand);border-radius:12px;padding:14px;margin-bottom:10px}
-.card h3{margin:0;font-size:1.1rem}
-.card .role{color:var(--accent);font-weight:600}
-.card .unit{color:var(--mute)}
-.phone{font-weight:600;margin:8px 0;letter-spacing:.02em}
-.acts{display:flex;gap:8px;flex-wrap:wrap}
-.acts a,.acts button{flex:1;min-width:90px;text-align:center;text-decoration:none;padding:9px 10px;border-radius:9px;font-weight:600;cursor:pointer;border:0}
-.call{background:var(--brand);color:#fff}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:12px;box-shadow:0 2px 8px rgba(15,76,92,.06)}
+.top{display:flex;gap:12px;align-items:center}
+.av{flex:none;width:48px;height:48px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:1.2rem;color:#fff}
+.card h3{margin:0;font-size:1.08rem;line-height:1.3}
+.role{display:inline-block;margin-top:2px;padding:1px 10px;border-radius:99px;background:color-mix(in srgb,var(--accent) 15%,transparent);color:var(--accent);font-weight:600;font-size:.88rem}
+.unit{color:var(--mute);font-size:.92rem;margin-top:2px}
+.phone{font-weight:600;font-size:1.05rem;margin:10px 0;letter-spacing:.03em}
+.acts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.acts a{text-align:center;text-decoration:none;padding:10px;border-radius:10px;font-weight:600}
+.call{background:var(--brand);color:var(--onb)}
 .wa{background:var(--wa);color:#fff}
-.small{background:transparent;border:1.5px solid var(--line)!important;color:var(--ink)}
+.adm{display:flex;gap:8px;margin-top:8px;padding-top:8px;border-top:1px solid var(--line)}
+.small{flex:1;background:transparent;border:1.5px solid var(--line);color:var(--ink);border-radius:9px;padding:7px;font-weight:600;cursor:pointer}
+.av{object-fit:cover}
+.brash{font-weight:600;color:var(--brand);font-size:.92rem}
+.pick{display:flex;align-items:center;gap:12px}
+.pick label.pickbtn{margin:0;display:inline-block;cursor:pointer}
+#mPrev{width:64px;height:64px}
+.meta #count{font-weight:600;color:var(--ink)}
 .empty{text-align:center;color:var(--mute);padding:36px 12px}
 .note{background:#FFF4D6;color:#5A4300;border-radius:10px;padding:8px 12px;margin-bottom:12px;font-size:.9rem}
 dialog{border:0;border-radius:16px;padding:20px;width:min(92vw,420px);background:var(--card);color:var(--ink)}
@@ -53,10 +66,9 @@ dialog label{display:block;font-weight:600;margin:10px 0 4px}
 </style>
 </head>
 <body>
+<header class="hero"><div class="in"><h1 id="title"></h1><p class="sub" id="subtitle"></p></div></header>
 <div class="wrap">
-  <h1 id="title"></h1>
-  <p class="sub" id="subtitle"></p>
-  <div id="demoNote" class="note" hidden>ডেমো মোড: ডাটাবেস সংযুক্ত নেই। সদস্য কোড ১২৩৪, অ্যাডমিন কোড ০০০০ (ইংরেজি সংখ্যায় লিখুন)।</div>
+  <div id="demoNote" class="note" hidden>ডেমো মোড: ডাটাবেস সংযুক্ত নেই। সদস্য কোড 1234, অ্যাডমিন কোড 0000।</div>
 
   <section id="login" class="login">
     <label for="code">অ্যাক্সেস কোড</label>
@@ -67,7 +79,7 @@ dialog label{display:block;font-weight:600;margin:10px 0 4px}
 
   <section id="app" hidden>
     <div class="bar">
-      <input id="q" type="search" placeholder="নাম বা মোবাইল নম্বর দিয়ে খুঁজুন">
+      <input id="q" type="search" placeholder="নাম, ব্রাশ বা মোবাইল নম্বর দিয়ে খুঁজুন">
     </div>
     <div class="filters">
       <select id="fDes" aria-label="পদবি"><option value="">সব পদবি</option></select>
@@ -87,6 +99,9 @@ dialog label{display:block;font-weight:600;margin:10px 0 4px}
 <dialog id="dlg">
   <form method="dialog" id="form">
     <h2 id="dlgTitle">সদস্যের তথ্য</h2>
+    <label>প্রোফাইল ছবি</label>
+    <div class="pick"><img id="mPrev" class="av" alt="" hidden><label class="btn alt pickbtn" for="mPhoto">ছবি বাছুন</label><input id="mPhoto" type="file" accept="image/*" hidden></div>
+    <label for="mBrash">ব্রাশ নম্বর</label><input id="mBrash" placeholder="যেমন BP-001">
     <label for="mName">নাম</label><input id="mName" required>
     <label for="mDes">পদবি</label><input id="mDes">
     <label for="mUnit">বিভাগ বা অফিস</label><input id="mUnit">
@@ -124,12 +139,12 @@ const bad = () => { throw new Error("কোড ভুল"); };
 const api = sb ? {
   async login(code){ const {data,error}=await sb.rpc("login",{code}); if(error) throw error; return data; },
   async list(code){ const {data,error}=await sb.rpc("list_members",{code}); if(error) throw error; return data; },
-  async save(code,m){ const {error}=await sb.rpc("save_member",{admin_code:code,m_id:m.id||null,m_name:m.name,m_des:m.designation,m_unit:m.unit,m_phone:m.phone}); if(error) throw error; },
+  async save(code,m){ const {error}=await sb.rpc("save_member",{admin_code:code,m_id:m.id||null,m_name:m.name,m_des:m.designation,m_unit:m.unit,m_phone:m.phone,m_brash:m.brash_no||null,m_photo:m.photo||null}); if(error) throw error; },
   async del(code,id){ const {error}=await sb.rpc("delete_member",{admin_code:code,m_id:id}); if(error) throw error; }
 } : {
   async login(code){ return code==="0000"?"admin":code==="1234"?"member":"none"; },
   async list(){ return [...demoRows]; },
-  async save(code,m){ if(code!=="0000") bad(); if(m.id) demoRows=demoRows.map(r=>r.id===m.id?{...r,...m}:r); else demoRows.push({...m,id:String(Date.now())}); },
+  async save(code,m){ if(code!=="0000") bad(); if(m.id) demoRows=demoRows.map(r=>r.id===m.id?{...r,...m,photo:m.photo||r.photo}:r); else demoRows.push({...m,id:String(Date.now())}); },
   async del(code,id){ if(code!=="0000") bad(); demoRows=demoRows.filter(r=>r.id!==id); }
 };
 
@@ -162,27 +177,31 @@ function fillFilters(){
   opts("designation",$("fDes"),"সব পদবি"); opts("unit",$("fUnit"),"সব বিভাগ");
 }
 
+const COLORS=["#0F4C5C","#B5441A","#5B4B8A","#2F7D4F","#8A5A12","#1F5FA8"];
+const hash=s=>[...String(s)].reduce((a,c)=>a+c.codePointAt(0),0);
 function render(){
   const q=$("q").value.trim().toLowerCase(), d=$("fDes").value, u=$("fUnit").value;
-  const res=rows.filter(r=>(!d||r.designation===d)&&(!u||r.unit===u)&&(!q||(r.name||"").toLowerCase().includes(q)||digits(r.phone).includes(digits(q)||"x")||(r.phone||"").includes(q)));
-  $("count").textContent = `মোট ${bn(res.length)} জন`;
+  const res=rows.filter(r=>(!d||r.designation===d)&&(!u||r.unit===u)&&(!q||(r.name||"").toLowerCase().includes(q)||digits(r.phone).includes(digits(q)||"x")||(r.phone||"").includes(q)||(r.brash_no||"").toLowerCase().includes(q)));
+  $("count").textContent = `মোট ${res.length} জন`;
   $("list").innerHTML = res.length ? res.map(r=>`
     <article class="card">
-      <h3>${esc(r.name)}</h3>
-      <div><span class="role">${esc(r.designation)}</span>${r.unit?` <span class="unit">· ${esc(r.unit)}</span>`:""}</div>
+      <div class="top">${r.photo?`<img class="av" src="${esc(r.photo)}" alt="">`:`<div class="av" style="background:${COLORS[hash(r.name)%COLORS.length]}">${esc(Array.from(r.name||"?")[0])}</div>`}
+      <div><h3>${esc(r.name)}</h3>${r.brash_no?`<div class="brash">ব্রাশ নম্বর: ${esc(r.brash_no)}</div>`:""}${r.designation?`<span class="role">${esc(r.designation)}</span>`:""}${r.unit?`<div class="unit">${esc(r.unit)}</div>`:""}</div></div>
       <div class="phone">${esc(r.phone)}</div>
       <div class="acts">
         <a class="call" href="tel:${esc(digits(r.phone))}">কল করুন</a>
         <a class="wa" href="https://wa.me/${waNum(r.phone)}" target="_blank" rel="noopener">WhatsApp</a>
-        ${role==="admin"?`<button class="small" data-edit="${esc(r.id)}">সম্পাদনা</button><button class="small" data-del="${esc(r.id)}">মুছুন</button>`:""}
       </div>
+      ${role==="admin"?`<div class="adm"><button class="small" data-edit="${esc(r.id)}">সম্পাদনা</button><button class="small" data-del="${esc(r.id)}">মুছুন</button></div>`:""}
     </article>`).join("") : `<div class="empty">কাউকে পাওয়া যায়নি। খোঁজার শব্দ বা ফিল্টার বদলে দেখুন।</div>`;
 }
 
-let editId=null;
+let editId=null, newPhoto=null;
+const setPrev=src=>{const i=$("mPrev"); i.hidden=!src; if(src) i.src=src;};
+function shrink(file){return new Promise((res,rej)=>{const img=new Image(),u=URL.createObjectURL(file);img.onload=()=>{const S=240,c=document.createElement("canvas");c.width=c.height=S;const m=Math.min(img.width,img.height);c.getContext("2d").drawImage(img,(img.width-m)/2,(img.height-m)/2,m,m,0,0,S,S);URL.revokeObjectURL(u);res(c.toDataURL("image/jpeg",0.8));};img.onerror=rej;img.src=u;});}
 function openForm(r){
   editId=r?r.id:null; $("dlgTitle").textContent=r?"তথ্য সম্পাদনা":"নতুন সদস্য যোগ";
-  $("mName").value=r?.name||""; $("mDes").value=r?.designation||""; $("mUnit").value=r?.unit||""; $("mPhone").value=r?.phone||"";
+  $("mBrash").value=r?.brash_no||""; newPhoto=null; $("mPhoto").value=""; setPrev(r?.photo||""); $("mName").value=r?.name||""; $("mDes").value=r?.designation||""; $("mUnit").value=r?.unit||""; $("mPhone").value=r?.phone||"";
   $("dlg").showModal();
 }
 async function reload(){ rows=await api.list(code); fillFilters(); render(); }
@@ -192,11 +211,12 @@ $("code").addEventListener("keydown",e=>{ if(e.key==="Enter") enter($("code").va
 $("logoutBtn").onclick=()=>{ try{localStorage.removeItem("dir_code");}catch{} code="";role="none";rows=[]; $("code").value=""; $("app").hidden=true; $("login").hidden=false; };
 $("q").oninput=render; $("fDes").onchange=render; $("fUnit").onchange=render;
 $("addBtn").onclick=()=>openForm(null);
+$("mPhoto").addEventListener("change",async e=>{const f=e.target.files[0]; if(!f) return; try{ newPhoto=await shrink(f); setPrev(newPhoto); }catch{ alert("ছবিটি পড়া যায়নি, অন্য ছবি বেছে নিন।"); }});
 $("cancel").onclick=()=>$("dlg").close();
 $("form").addEventListener("submit",async e=>{
   e.preventDefault();
   try{
-    await api.save(code,{id:editId,name:$("mName").value.trim(),designation:$("mDes").value.trim(),unit:$("mUnit").value.trim(),phone:$("mPhone").value.trim()});
+    await api.save(code,{id:editId,name:$("mName").value.trim(),designation:$("mDes").value.trim(),unit:$("mUnit").value.trim(),phone:$("mPhone").value.trim(),brash_no:$("mBrash").value.trim(),photo:newPhoto});
     $("dlg").close(); await reload();
   }catch{ alert("সংরক্ষণ করা যায়নি। অ্যাডমিন কোড ও ইন্টারনেট দেখুন।"); }
 });
