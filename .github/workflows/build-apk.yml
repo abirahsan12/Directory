@@ -26,21 +26,22 @@ jobs:
         run: |
           pip install --break-system-packages pillow || true
           mkdir assets
-          python3 - <<'EOF'
+          python3 - <<'PYEOF'
           from PIL import Image
           L = Image.open('icon.png').convert('RGBA')
           L.save('assets/icon-only.png')
           fg = Image.new('RGBA', (1024, 1024), (0, 0, 0, 0))
-          s = int(1024 * 0.62)
+          s = int(1024 * 0.70)
           f = L.resize((s, s), Image.LANCZOS)
           fg.paste(f, ((1024 - s) // 2, (1024 - s) // 2), f)
           fg.save('assets/icon-foreground.png')
+          Image.new('RGBA', (1024, 1024), (255, 255, 255, 255)).save('assets/icon-background.png')
           sp = Image.new('RGBA', (2732, 2732), (255, 255, 255, 255))
           b = L.resize((900, 900), Image.LANCZOS)
           sp.paste(b, ((2732 - 900) // 2, (2732 - 900) // 2), b)
           sp.save('assets/splash.png')
           sp.save('assets/splash-dark.png')
-          EOF
+          PYEOF
           npx @capacitor/assets generate --android --iconBackgroundColor '#FFFFFF' --iconBackgroundColorDark '#FFFFFF' --splashBackgroundColor '#FFFFFF' --splashBackgroundColorDark '#FFFFFF'
       - name: Sync
         run: npx cap sync android
@@ -50,28 +51,4 @@ jobs:
         run: |
           cd android
           sed -i 's/networkTimeout=10000/networkTimeout=120000/' gradle/wrapper/gradle-wrapper.properties
-          chmod +x gradlew
-          ./gradlew assembleDebug 2>&1 | tee ../build.log
-          test ${PIPESTATUS[0]} -eq 0
-      - name: Fallback if build failed
-        if: steps.b.outcome == 'failure'
-        run: |
-          { echo '### আইকনসহ বিল্ড ব্যর্থ হয়েছিল, কারণ:'; echo '```'; grep -A12 'What went wrong' build.log | head -40; echo '```'; } >> $GITHUB_STEP_SUMMARY || true
-          rebuild() {
-            rm -rf android &&
-            npx cap add android &&
-            npx cap sync android &&
-            (cd android &&
-              sed -i 's/networkTimeout=10000/networkTimeout=120000/' gradle/wrapper/gradle-wrapper.properties &&
-              chmod +x gradlew &&
-              ./gradlew assembleDebug)
-          }
-          rebuild || {
-            echo 'আইকন ছাড়াও ব্যর্থ, এবার ইংরেজি নামে চেষ্টা' >> $GITHUB_STEP_SUMMARY
-            node -e "const f='capacitor.config.json',c=require('./'+f);c.appName='Sirajganj Police';require('fs').writeFileSync(f,JSON.stringify(c,null,2))"
-            rebuild
-          }
-      - uses: actions/upload-artifact@v4
-        with:
-          name: directory-apk
-          path: android/app/build/outputs/apk/debug/app-debug.apk
+          c
