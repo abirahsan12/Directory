@@ -51,4 +51,28 @@ jobs:
         run: |
           cd android
           sed -i 's/networkTimeout=10000/networkTimeout=120000/' gradle/wrapper/gradle-wrapper.properties
-          c
+          chmod +x gradlew
+          ./gradlew assembleDebug 2>&1 | tee ../build.log
+          test ${PIPESTATUS[0]} -eq 0
+      - name: Fallback if build failed
+        if: steps.b.outcome == 'failure'
+        run: |
+          { echo '### আইকনসহ বিল্ড ব্যর্থ হয়েছিল, কারণ:'; echo '```'; grep -A12 'What went wrong' build.log | head -40; echo '```'; } >> $GITHUB_STEP_SUMMARY || true
+          rebuild() {
+            rm -rf android &&
+            npx cap add android &&
+            npx cap sync android &&
+            (cd android &&
+              sed -i 's/networkTimeout=10000/networkTimeout=120000/' gradle/wrapper/gradle-wrapper.properties &&
+              chmod +x gradlew &&
+              ./gradlew assembleDebug)
+          }
+          rebuild || {
+            echo 'আইকন ছাড়াও ব্যর্থ, এবার ইংরেজি নামে চেষ্টা' >> $GITHUB_STEP_SUMMARY
+            node -e "const f='capacitor.config.json',c=require('./'+f);c.appName='Sirajganj Police';require('fs').writeFileSync(f,JSON.stringify(c,null,2))"
+            rebuild
+          }
+      - uses: actions/upload-artifact@v4
+        with:
+          name: directory-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
