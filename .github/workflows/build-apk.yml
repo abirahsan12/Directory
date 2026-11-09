@@ -18,10 +18,32 @@ jobs:
           mkdir www && cp index.html www/index.html
           npm init -y
           npm i @capacitor/core@6 @capacitor/cli@6 @capacitor/android@6
-          npx cap init "Colleague Directory" com.abir.directory --web-dir=www
+          npx cap init "সিরাজগঞ্জ জেলা পুলিশ" com.abir.directory --web-dir=www
           node -e "const f='capacitor.config.json',c=require('./'+f);c.server={url:'https://directory-orpin-seven.vercel.app'};require('fs').writeFileSync(f,JSON.stringify(c,null,2))"
           npx cap add android
-          npx cap sync android
+      - name: App icon and splash from logo
+        continue-on-error: true
+        run: |
+          pip install --break-system-packages pillow || true
+          mkdir assets
+          python3 - <<'EOF'
+          from PIL import Image
+          L = Image.open('icon.png').convert('RGBA')
+          L.save('assets/icon-only.png')
+          fg = Image.new('RGBA', (1024, 1024), (0, 0, 0, 0))
+          s = int(1024 * 0.62)
+          f = L.resize((s, s), Image.LANCZOS)
+          fg.paste(f, ((1024 - s) // 2, (1024 - s) // 2), f)
+          fg.save('assets/icon-foreground.png')
+          sp = Image.new('RGBA', (2732, 2732), (255, 255, 255, 255))
+          b = L.resize((900, 900), Image.LANCZOS)
+          sp.paste(b, ((2732 - 900) // 2, (2732 - 900) // 2), b)
+          sp.save('assets/splash.png')
+          sp.save('assets/splash-dark.png')
+          EOF
+          npx @capacitor/assets generate --android --iconBackgroundColor '#FFFFFF' --iconBackgroundColorDark '#FFFFFF' --splashBackgroundColor '#FFFFFF' --splashBackgroundColorDark '#FFFFFF'
+      - name: Sync
+        run: npx cap sync android
       - name: Build APK
         run: |
           cd android
